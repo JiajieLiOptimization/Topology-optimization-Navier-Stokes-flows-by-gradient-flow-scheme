@@ -1,0 +1,29 @@
+  -- Solve :
+          min -0.00946947  max 0.124904
+          min -0.00752744  max 0.307217
+  -- Solve :
+          min -0.00151266  max 0.00114989
+          min -0.0139488  max 0.0203528
+  -- Solve :
+          min -1.78627e-07  max 1.64844e-07
+          min -2.67043e-07  max 7.87296e-07
+  -- Solve :
+          min -1.43545e-14  max 1.24123e-14
+          min -5.5326e-15  max 2.83452e-14
+  -- Solve :
+          min -0.000451927  max 0.000454949
+          min -0.308262  max 0.00754089
+  -- Solve :
+          min -0.123134  max 1.16937
+          min 0.284387  max 0.315712
+  -- Solve :
+          min -0.12435  max 1.1693
+          min 0.282727  max 0.31073
+Van Der Waal free energy:0.253159
+drag: 0.00439519
+ 0x1e56ebc6310 VTK_FILE 1
+times: compile 0.118s, execution 268.168s,  mpirank:0
+ ######## We forget of deleting   20441235 Nb pointer,   0Bytes  ,  mpirank 0, memory leak =0
+ CodeAlloc : nb ptr  5764,  size :618640 mpirank: 0
+Ok: Normal End
+ try getConsole C:\Users\user\Desktop\NS\二维双通道设计\mu0.01\NS_CahnHiliard_2inflow_2out.edp

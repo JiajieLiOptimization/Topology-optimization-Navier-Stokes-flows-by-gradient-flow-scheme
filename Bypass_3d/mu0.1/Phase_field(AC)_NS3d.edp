@@ -1,0 +1,190 @@
+
+// ===========================================
+//           Shape Optimization
+//           Navier-Stokes themal 3d
+// ===========================================
+load "lapack" // For call matrix inverse
+load "iovtk"
+load "msh3"
+load "medit"
+include "cube.idp"
+
+// ===========================================
+//                define macro
+// ===========================================
+macro Grad(u) [dx(u),dy(u),dz(u)] //
+
+macro inner(u1,u2,u3,v1,v2,v3)
+		u1*v1+u2*v2+u3*v3//
+
+macro div(u1,u2,u3) (dx(u1)+dy(u2)+dz(u3))//
+
+macro  bilin(u1,u2,u3,v1,v2,v3) (dx(u1)*dx(v1)+dy(u1)*dy(v1)+dz(u1)*dz(v1)
+         +dx(u2)*dx(v2)+dy(u2)*dy(v2)+dz(u2)*dz(v2)
+		  +dx(u3)*dx(v3)+dy(u3)*dy(v3)+dz(u3)*dz(v3)
+		 )//
+
+macro  mix(v1,v2,v3,q)  (dx(v1)*q+dy(v2)*q+dz(v3)*q)  //
+
+macro UgradV(u1,u2,u3,v1,v2,v3)
+      [ [u1,u2,u3]'*[dx(v1),dy(v1),dz(v1)] , [u1,u2,u3]'*[dx(v2),dy(v2),dz(v2)] , [u1,u2,u3]'*[dx(v3),dy(v3),dz(v3)] ] //
+
+macro UgradVT(u1,u2,u3,v1,v2,v3)
+      [ [u1,u2,u3]'*[dx(v1),dx(v2),dx(v3)] , [u1,u2,u3]'*[dy(v1),dy(v2),dy(v3)] , [u1,u2,u3]'*[dz(v1),dz(v2),dz(v3)] ] //
+
+func phi0 = 1- ( 0.5*(1-0.001)*cos(pi*4*x)*cos(pi*4*y)*cos(pi*4*z)+0.5*(1+0.001) );
+
+
+// ===========================================
+//								mesh import
+// ===========================================
+mesh3 Th;
+Th = readmesh3("Cubic3Tubes_Newfine");
+
+// ===========================================
+//            finite element space
+// ===========================================
+fespace Vh(Th,P1b);
+Vh u1,u2,u3,v1,v2,v3,du1,du2,du3,uu1,uu2,uu3,vv1,vv2,vv3;
+fespace Wh(Th,P1);
+Wh p,q,dp,pp,qq,phi=0.5,phip=phi,psi,r,T,S;//randreal1()
+
+// ===========================================
+//            parameters setting
+// ===========================================
+real mu = 0.1; //mu=1.0/Re
+real Re = 100;
+real Pr = 6.78;
+real alphaMax = 1e3;
+real dt = 0.0025;
+real Sta = 1.0;
+real kappa = 1e-4;
+real kappa2 = 1e-1;
+real Vol,VolTarg=0.85;
+real beta = 10.0;
+real lag = 0.0;
+real eta = 10.0;
+real kT = 1.0;
+real sqrtnorm;
+real objective;
+real EnergyDissipation;
+real volumeERR;
+
+int[int] wallLabs = [4,5,6,7,8,9,10,11,12,13,14,15,16,17];
+int[int] outflowLabs = [2,3];
+int inflowLab = 1;
+int Nmax = 120;
+int PhaseIterNum = 20;
+// ===========================================
+//            P.D.E setting
+// ===========================================
+problem Stokes([u1,u2,u3,p],[v1,v2,v3,q])=
+int3d(Th)(mu*(Grad(u1)'*Grad(v1)+Grad(u2)'*Grad(v2)+Grad(u3)'*Grad(v3))
+			   + alphaMax*(1-phi)*inner(u1,u2,u3,v1,v2,v3)
+		       - (dx(u1)+dy(u2)+dz(u3))*q-(dx(v1)+dy(v2)+dz(v3))*p+ 1e-10*q*p)
++on(inflowLab,u1=0,u2=0,u3=-1.0)
++on(wallLabs,u1=0,u2=0,u3=0);
+
+problem Oseen([du1,du2,du3,dp],[v1,v2,v3,q]) =
+int3d(Th) (  mu*(Grad(du1)'*Grad(v1) + Grad(du2)'*Grad(v2) + Grad(du3)'*Grad(v3))
+            + UgradV(du1,du2,du3, u1, u2,u3)'*[v1,v2,v3]
+            + UgradV( u1, u2,u3,du1,du2,du3)'*[v1,v2,v3]
+						+ alphaMax*(1-phi)*([du1,du2,du3]'*[v1,v2,v3])
+            - div(du1,du2,du3)*q - div(v1,v2,v3)*dp
+            - 1e-10*dp*q // stabilization term
+           )
+- int3d(Th) (  mu*(Grad(u1)'*Grad(v1) + Grad(u2)'*Grad(v2) + Grad(u3)'*Grad(v3))
+            + UgradV(u1,u2,u3, u1, u2,u3)'*[v1,v2,v3]
+						+ alphaMax*(1-phi)*([u1,u2,u3]'*[v1,v2,v3])
+            - div(u1,u2,u3)*q - div(v1,v2,v3)*p
+            - 1e-10*p*q
+           )
++ on(inflowLab,wallLabs,du1=0,du2=0,du3=0);
+
+problem AdjointNS([uu1,uu2,uu3,pp],[vv1,vv2,vv3,qq])=
+int3d(Th)( mu*(Grad(uu1)'*Grad(vv1)+Grad(uu2)'*Grad(vv2)+Grad(uu3)'*Grad(vv3) )
+         - UgradV(u1,u2,u3,uu1,uu2,uu3)'*[vv1,vv2,vv3]
+		 	 	 + UgradVT(uu1,uu2,uu3,u1,u2,u3)'*[vv1,vv2,vv3]
+				 + alphaMax*(1-phi)*[uu1,uu2,uu3]'*[vv1,vv2,vv3]
+         - div(vv1,vv2,vv3)*pp
+		 	 	 - div(uu1,uu2,uu3)*qq-1e-10*pp*qq)
+- int3d(Th)( mu*(bilin(u1,u2,u3,vv1,vv2,vv3)) +alphaMax*(1-phi)*[u1,u2,u3]'*[vv1,vv2,vv3] )
+ +on(inflowLab,wallLabs,uu1=0,uu2=0,uu3=0);
+
+
+problem AllenCahn(phi,psi,init=0)
+= int3d(Th)(phi*psi)+int3d(Th)(Sta*dt*phi*psi)-int3d(Th)(Sta*dt*phip*psi)
++ int3d(Th)( dt*kappa*Grad(phi)'*Grad(psi))
++ int3d(Th)( -phip*psi)
+- int3d(Th)(dt*beta*(Vol-VolTarg)*psi+dt*lag*psi)
++ int3d(Th)(1/kappa2*dt*phip*(1-phip)*(-(phip-0.5))*psi)
+//- int3d(Th)(0.5*dt*alphaMax*(inner(u1,u2,u3,uu1,uu2,uu3)-0.5*inner(u1,u2,u3,u1,u2,u3))*psi)
++ int3d(Th)(dt*r*psi);
+
+
+for (int iter=1;iter <= Nmax;iter=iter+1)
+{
+  cout<<"iter :"<<iter<<endl;
+
+	// Solving state and adjoint state problems
+	Stokes;
+	for( int n=0;n < 3;n++)
+		{
+			Oseen;
+			u1 = u1 - du1; u2 = u2 - du2; u3 = u3 - du3;
+			p  = p-dp;
+		 }
+	AdjointNS;
+	// calculate important parameters
+	 Vol = int3d(Th)(1-phi);
+	 cout<< "solid volume: "<<Vol<<endl;
+	 objective = int3d(Th)(0.5*mu*bilin(u1,u2,u3,u1,u2,u3)+0.5*alphaMax*(1-phi)*inner(u1,u2,u3,u1,u2,u3))
+	 						+ int3d(Th)(0.5*kappa*Grad(phi)'*Grad(phi)+0.25/kappa2*(phi-1)^2*phi^2)
+							+ 0.5*beta*(Vol-VolTarg)^2;
+	 cout<<"Van Der Waal free energy:"<<objective<<endl;
+
+   ofstream obj("obj.txt",append);
+   obj<<objective <<endl;
+   volumeERR = abs(Vol-VolTarg);
+   ofstream VolErrRec("volumeERR.txt",append);
+   VolErrRec<<volumeERR <<endl;
+
+	 // update lagrange multiplier
+	 lag = lag+0.1*(Vol-VolTarg);
+//savevtk("VelFlow.vtk", Th, [u1,u2,u3], dataname="StokesSol");
+	//gradient = gradient/sqrt(norm);
+
+	// updating r
+	//r = -(phip-0.5)+5*phip*(1-phip)*(alphaMax*(-0.5*inner(u1,u2,u3,u1,u2,u3)));
+	real norm = int3d(Th)((-alphaMax*(inner(u1,u2,u3,uu1,uu2,uu3)+0.5*inner(u1,u2,u3,u1,u2,u3)) )^2);
+	sqrtnorm = sqrt(norm);
+  r = eta/sqrtnorm*(-alphaMax*(inner(u1,u2,u3,uu1,uu2,uu3)+0.5*inner(u1,u2,u3,u1,u2,u3)) );
+	//updating phase field function
+	phip = phi;
+	for(int k=0;k<PhaseIterNum;k++)
+	{
+		 AllenCahn;
+		 phip = phi;
+
+		 phip = max(0,phip);
+		 phip = min(phip,1);
+		 Vol = int3d(Th)(1-phi);
+	/*
+	Vol = int3d(Th)(1-phi);
+	objective = int3d(Th)(0.5*mu*bilin(u1,u2,u3,u1,u2,u3)+0.5*alphaMax*(1-phi)*inner(u1,u2,u3,u1,u2,u3))
+	 						+ int3d(Th)(0.5*kappa*Grad(phi)'*Grad(phi)+0.25*(phi-1)^2*phi^2)
+							+ 0.5*beta*(Vol-VolTarg)^2;
+	cout<<"Van Der Waal free energy:"<<objective<<endl;
+	EnergyDissipation = int3d(Th)(0.5*mu*bilin(u1,u2,u3,u1,u2,u3)+0.5*alphaMax*(1-phi)*inner(u1,u2,u3,u1,u2,u3));
+	cout<<"Energy dissipation for fluid:"<<EnergyDissipation<<endl;
+	*/
+	}
+	phi  = max(0,phi);
+	phi  = min(phi,1);
+	string caption= " Free energy: "+objective+" volume: "+ Vol+ " iter :"+iter;
+	plot(phi, cmm=caption, fill=1,value=1);
+};
+string outputFile1 = "./Vel" + ".vtk";
+string outputFile3 = "./Phi" + ".vtk";
+savevtk(outputFile1,Th,[u1,u2,u3],dataname="Velocity");
+savevtk(outputFile3,Th,phi,dataname="phi");

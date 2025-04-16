@@ -1,0 +1,29 @@
+          min 0.132125  max 0.134633
+Van Der Waal free energy:13.7196
+iter: 149
+Volume equals: 0.4
+  -- Solve :
+          min -1.02684  max 3.9894
+          min -3.91649  max 38.2225
+  -- Solve :
+          min -0.160041  max 0.171428
+          min -11.3132  max 0.691171
+  -- Solve :
+          min -0.00125329  max 0.00113299
+          min -0.00597799  max 0.0142258
+  -- Solve :
+          min -5.43988e-08  max 4.62015e-08
+          min -5.02891e-07  max 1.12378e-06
+  -- Solve :
+          min -0.133469  max 0.134758
+          min -38.899  max 3.9079
+  -- Solve :
+          min -0.0594051  max 1.03564
+          min 0.131773  max 0.134238
+Van Der Waal free energy:13.6966
+ 0x1b2d62a8df0 VTK_FILE 1
+times: compile 0.11s, execution 128.065s,  mpirank:0
+ ######## We forget of deleting   11101743 Nb pointer,   0Bytes  ,  mpirank 0, memory leak =0
+ CodeAlloc : nb ptr  5551,  size :610000 mpirank: 0
+Ok: Normal End
+ try getConsole C:\Users\user\Desktop\NS\¶þÎ¬diffuser\CH\muE-1\NS_CH.edp

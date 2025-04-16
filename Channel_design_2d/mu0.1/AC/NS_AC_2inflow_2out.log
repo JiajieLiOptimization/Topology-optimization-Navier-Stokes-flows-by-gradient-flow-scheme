@@ -1,0 +1,28 @@
+  209 :         //ffnt<<Th(i).x<<"   "<<Th(i).y<<"   "<<T(Th(i).x,Th(i).y)<<endl;
+  210 :           ffuv<<Th(i).x<<"   "<<Th(i).y<<"   "<<u1(Th(i).x,Th(i).y)<<"   "<<u2(Th(i).x,Th(i).y)<<"     "<<sqrt(uJ{1^2+u2^2)(Th(i).x,Th(i).y)<<endl;
+  211 :         }
+  212 :       //
+  213 :         for(i=0;i<Th.nt;i++)
+  214 :         {
+  215 :         for( j=0;j<3;j++)
+  216 :         {
+  217 :         //ffnt<<Th[i][j]+1<<"  ";
+  218 :         ffuv<<Th[i][j]+1<<"  ";
+  219 :           }
+  220 :         if(j==3)
+  221 :         {
+  222 :         //ffnt<<endl;
+  223 :         ffuv<<endl;
+  224 :           }
+  225 :        }
+  226 :   }
+  227 : }
+  228 :  sizestack + 1024 =18948  ( 17924 )
+ 
+  --  mesh:  Nb of Triangles =  12312, Nb of Vertices 6307
+iter: 1
+Volume equals: 1.45497
+  -- Solve :
+          min -0.0951822  max 0.124904
+          min -0.666788  max 52.2786
+ try getConsole C:\Users\user\Desktop\NS\二维双通道设计\mu0.1\AC\NS_AC_2inflow_2out.edp

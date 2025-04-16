@@ -1,0 +1,29 @@
+          min -0.0289804  max 0.0422504
+          min -18.1386  max 0.679616
+solid volume: 0.204996
+Van Der Waal free energy:0.100964
+  -- Solve :
+          min -0.00263888  max 1.12535
+  -- Solve :
+          min -0.00310376  max 1.12489
+  -- Solve :
+          min -0.00303687  max 1.12496
+  -- Solve :
+          min -0.00303764  max 1.12496
+  -- Solve :
+          min -0.00302991  max 1.12496
+  -- Solve :
+          min -0.00302341  max 1.12497
+  -- Solve :
+          min -0.00301656  max 1.12498
+  -- Solve :
+          min -0.00300973  max 1.12498
+  -- Solve :
+          min -0.00300298  max 1.12499
+  -- Solve :
+          min -0.00299619  max 1.125
+  -- Solve :
+          min -0.00298951  max 1.12501
+  -- Solve :
+          min -0.0029829  max 1.12501
+ try getConsole C:\Users\user\Desktop\NS\三维多通道\bigV0\mu0.1\Phase_field(AC)_NS3d.edp

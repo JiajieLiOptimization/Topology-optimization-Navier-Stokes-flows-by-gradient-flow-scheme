@@ -1,0 +1,29 @@
+  -- Solve :
+          min -0.00128175  max 1.4047
+  -- Solve :
+          min -0.00128171  max 1.4047
+  -- Solve :
+          min -0.00128168  max 1.4047
+  -- Solve :
+          min -0.00128166  max 1.4047
+  -- Solve :
+          min -0.00128163  max 1.4047
+  -- Solve :
+          min -0.00128161  max 1.4047
+  -- Solve :
+          min -0.0012816  max 1.4047
+  -- Solve :
+          min -0.00128158  max 1.4047
+  -- Solve :
+          min -0.00128157  max 1.4047
+  -- Solve :
+          min -0.00128156  max 1.4047
+  -- Solve :
+          min -0.00128155  max 1.4047
+  -- Solve :
+          min -0.00128154  max 1.4047
+times: compile 0.186s, execution 10005s,  mpirank:0
+ ######## We forget of deleting   176602379 Nb pointer,   0Bytes  ,  mpirank 0, memory leak =0
+ CodeAlloc : nb ptr  5999,  size :643960 mpirank: 0
+Ok: Normal End
+ try getConsole C:\Users\user\Desktop\NS\ÈýÎ¬Bypass\mu0.1\Phase_field(AC)_NS3d.edp

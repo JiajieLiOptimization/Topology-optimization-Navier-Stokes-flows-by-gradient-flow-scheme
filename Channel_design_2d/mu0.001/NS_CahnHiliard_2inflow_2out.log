@@ -1,0 +1,29 @@
+          min 0.225115  max 0.290515
+Van Der Waal free energy:1.13666
+iter: 39
+Volume equals: 0.6
+  -- Solve :
+          min -0.525145  max 1.0627
+          min -0.0118233  max 3.61125
+  -- Solve :
+          min -0.351488  max 0.375166
+          min -0.495445  max 0.0219856
+  -- Solve :
+          min -0.02364  max 0.0278781
+          min -0.0238773  max 0.0570481
+  -- Solve :
+          min -0.000252579  max 0.00035252
+          min -0.000180977  max 0.000266615
+  -- Solve :
+          min -0.261997  max 0.25918
+          min -4.17836  max 0.00944732
+  -- Solve :
+          min -0.0914143  max 1.03591
+          min 0.223361  max 0.277405
+Van Der Waal free energy:1.13625
+ 0x2067ef76a40 VTK_FILE 1
+times: compile 0.182s, execution 78.342s,  mpirank:0
+ ######## We forget of deleting   5144756 Nb pointer,   0Bytes  ,  mpirank 0, memory leak =0
+ CodeAlloc : nb ptr  5731,  size :618304 mpirank: 0
+Ok: Normal End
+ try getConsole C:\Users\user\Desktop\NS\二维双通道设计\mu0.001\NS_CahnHiliard_2inflow_2out.edp

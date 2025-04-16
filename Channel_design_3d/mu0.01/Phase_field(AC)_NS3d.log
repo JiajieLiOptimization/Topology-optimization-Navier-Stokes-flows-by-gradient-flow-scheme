@@ -1,0 +1,29 @@
+  -- Solve :
+          min -0.000367645  max 1.09157
+  -- Solve :
+          min -0.000367285  max 1.09157
+  -- Solve :
+          min -0.000366978  max 1.09157
+  -- Solve :
+          min -0.000366691  max 1.09157
+  -- Solve :
+          min -0.000371379  max 1.09157
+  -- Solve :
+          min -0.000371143  max 1.09157
+  -- Solve :
+          min -0.000370895  max 1.09157
+  -- Solve :
+          min -0.000370665  max 1.09157
+  -- Solve :
+          min -0.000371279  max 1.09157
+  -- Solve :
+          min -0.000371113  max 1.09157
+  -- Solve :
+          min -0.000371013  max 1.09157
+times: compile 0.131s, execution 8529.27s,  mpirank:0
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+ ######## We forget of deleting   124545785 Nb pointer,   0Bytes  ,  mpirank 0, memory leak =0
+ CodeAlloc : nb ptr  6111,  size :650896 mpirank: 0
+Ok: Normal End
+ try getConsole C:\Users\user\Desktop\NS\三维多通道\mu0.01\Phase_field(AC)_NS3d.edp

@@ -1,0 +1,29 @@
+          min -14.2841  max 1.159
+  -- Solve :
+          min -0.000373879  max 0.000412727
+          min -0.0125005  max 0.00295097
+  -- Solve :
+          min -1.50626e-09  max 1.60676e-09
+          min -5.31687e-08  max 1.08953e-08
+  -- Solve :
+          min -0.0751751  max 0.0821684
+          min -170.764  max 2.25988
+  -- Solve :
+          min 0.477362  max 0.563619
+          min 0.0748636  max 0.335225
+Van Der Waal free energy:29.4631
+iter: 3
+Volume equals: 0.75
+  -- Solve :
+          min -0.447787  max 0.74707
+          min -2.39962  max 166.34
+  -- Solve :
+          min -0.157578  max 0.157396
+          min -13.5912  max 1.31361
+  -- Solve :
+          min -0.000359105  max 0.000394899
+          min -0.0117979  max 0.00279225
+  -- Solve :
+          min -1.39727e-09  max 1.51797e-09
+          min -4.86113e-08  max 1.01325e-08
+ try getConsole C:\Users\user\Desktop\NS\二维双通道设计\mu0.1\NS_CahnHiliard_2inflow_2out.edp

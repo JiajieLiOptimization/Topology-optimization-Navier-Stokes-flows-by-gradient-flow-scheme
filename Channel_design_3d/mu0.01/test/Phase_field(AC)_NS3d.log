@@ -1,0 +1,28 @@
+  -- Solve :
+          min -0.000242297  max 1.08061
+  -- Solve :
+          min -0.000235667  max 1.08062
+  -- Solve :
+          min -0.000231344  max 1.08062
+iter :19
+  -- Solve :
+          min -0.00739644  max 0.135137
+          min -0.0635172  max 0.0636022
+          min -0.0350299  max 0.0343899
+          min -0.134451  max 0.867163
+  -- Solve :
+          min -0.00489854  max 0.00668988
+          min -0.00897462  max 0.00917674
+          min -0.00300257  max 0.00353133
+          min -0.0432881  max 0.0298065
+  -- Solve :
+          min -1.9437e-05  max 1.3114e-05
+          min -2.06878e-05  max 1.85167e-05
+          min -5.6371e-06  max 4.01522e-06
+          min -2.35964e-05  max 3.6142e-05
+  -- Solve :
+          min -4.91839e-11  max 5.91769e-11
+          min -5.45104e-11  max 4.48555e-11
+          min -1.60618e-11  max 1.60305e-11
+          min -9.85941e-11  max 5.94646e-11
+ try getConsole C:\Users\user\Desktop\NS\三维多通道\mu0.01\test\Phase_field(AC)_NS3d.edp

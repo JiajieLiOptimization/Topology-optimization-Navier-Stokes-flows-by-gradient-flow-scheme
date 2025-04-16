@@ -1,0 +1,29 @@
+          min -0.257396  max 0.0180524
+  -- Solve :
+          min -0.00142988  max 1.12928
+  -- Solve :
+          min -0.00143183  max 1.12928
+  -- Solve :
+          min -0.00143377  max 1.12928
+  -- Solve :
+          min -0.0014357  max 1.12928
+  -- Solve :
+          min -0.00143762  max 1.12928
+  -- Solve :
+          min -0.00143948  max 1.12927
+  -- Solve :
+          min -0.00144126  max 1.12927
+  -- Solve :
+          min -0.00144298  max 1.12927
+  -- Solve :
+          min -0.00144464  max 1.12927
+  -- Solve :
+          min -0.00144624  max 1.12927
+Van Der Waal free energy:0.0932369
+drag: 0.00416453
+ 0x2572cdb1b50 VTK_FILE 1
+times: compile 0.187s, execution 373.709s,  mpirank:0
+ ######## We forget of deleting   17107842 Nb pointer,   0Bytes  ,  mpirank 0, memory leak =0
+ CodeAlloc : nb ptr  5814,  size :618520 mpirank: 0
+Ok: Normal End
+ try getConsole C:\Users\user\Desktop\NS\二维双通道设计\mu0.01\NS_AC_2inflow_2out.edp

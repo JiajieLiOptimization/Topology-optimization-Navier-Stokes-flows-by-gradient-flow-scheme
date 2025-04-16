@@ -1,0 +1,29 @@
+          min 0.52396  max 1.22734
+  -- Solve :
+          min 0.524663  max 1.22725
+  -- Solve :
+          min 0.52528  max 1.22716
+  -- Solve :
+          min 0.525814  max 1.22707
+  -- Solve :
+          min 0.526266  max 1.22699
+  -- Solve :
+          min 0.526639  max 1.22691
+  Plot::  Sorry no ps version for this type of plot 6
+iter :3
+  -- Solve :
+          min -0.0473822  max 0.792241
+          min -0.202661  max 0.193438
+          min -0.2107  max 0.202486
+          min -5.31796  max 68.6616
+  -- Solve :
+          min -0.0152375  max 0.0218881
+          min -0.0293027  max 0.0305112
+          min -0.00568783  max 0.00501507
+          min -1.83367  max 0.58234
+  -- Solve :
+          min -9.18938e-06  max 1.05832e-05
+          min -8.26385e-06  max 7.1176e-06
+          min -4.32951e-06  max 4.56753e-06
+          min -0.000128965  max 0.000356182
+ try getConsole C:\Users\user\Desktop\NS\三维多通道\test\Phase_field(AC)_NS3d.edp

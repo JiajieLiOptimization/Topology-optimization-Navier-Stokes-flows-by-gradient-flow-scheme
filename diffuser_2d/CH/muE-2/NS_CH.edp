@@ -1,0 +1,216 @@
+// ===================================================//
+//           Shape Optimization                       //
+// Energy disspation minimization: Navier-Stokes flow //
+//           phase field                              //
+//           Jiajie Li                 				  //
+// ===================================================//
+load "lapack" // For call matrix inverse
+load "iovtk"
+
+// Label of the boundary.
+int inflow=1;
+int outflow=2;
+int wall=3;
+
+int n2 = 12;//parameter of number of units
+real mm=1.5;//Width of the channel
+int iter;
+int Nmax=150;
+// =========================Set Real Parameters==========================================================================//
+real inflowCoff=4;  // definition of inflow coefficient
+real mu=0.01; //Denote viscous coefficient
+real alpha=10^3; //Darcy law coefficient high bound
+real VolTarg =0.525;
+real objective;
+real Vol;
+real PhaseIterNum = 1;
+real dt = 0.0025;
+real kappa = 0.001;
+real kappa2 = 0.025;
+real beta = 500;
+real lag= 0.0;
+real Sta1 = 1.0;
+real Sta2 = 0.5;
+real eta = 1;
+real sqrtnorm;
+real M;
+real Maxphi, Minphi;
+// =========================End Real Parameters==========================================================================//
+border wall1(t=1.0,0.0){x=t; y=1.0; label=wall;};
+border left(t=1.0,0.0) {x=0.0; y=t; label=inflow;};
+border wall2(t=0.0,1.0){x=t; y=0.0; label=wall;};
+border right1(t=0.0,0.33){x=1.0; y=t; label=wall;};
+border right2(t=0.33,0.66){x=1.0; y=t; label=outflow;};
+border right3(t=0.66,1.0){x=1.0; y=t; label=wall;};
+
+// Define mesh
+mesh Th = buildmesh(wall1(3*n2)+left(3*n2)+wall2(3*n2)+right1(n2)+right2(n2)+right3(n2));
+
+// Function Space
+fespace Vh2(Th,[P1b,P1b]);
+fespace Vh1(Th,P1);
+fespace Vh0(Th,P0);
+
+Vh2 [u1,u2],[v1,v2],[du1,du2],[uu1,uu2],[vv1,vv2],[u1p,u2p];
+Vh1 p,q,pp,qq,dp,phi,phip,psi,r,nu,zeta,Darcy,Darcyp,X;
+
+
+// =================================================Define macro instructions=============================================//
+macro grad(u)[dx(u), dy(u)]//
+
+macro div(u1,u2)  (dx(u1)+dy(u2))//
+
+macro prodscal(t1,t2,p1,p2) (dx(t1)*dx(p1)+dy(t1)*dy(p1)+dx(t2)*dx(p2)+dy(t2)*dy(p2))+t1*p1+t2*p2 //  //H1 scalar product between vector-valued functions
+
+macro bilin(u1,u2,v1,v2) (dx(u1)*dx(v1)+dy(u1)*dy(v1)+dx(u2)*dx(v2)+dy(u2)*dy(v2))//
+
+macro mix(v1,v2,q) (dx(v1)*q+dy(v2)*q)  //
+
+macro Grad(u1,u2)  [ dx(u1),dy(u1), dx(u2),dy(u2) ] //
+
+macro GradUTV(u1,u2,v1,v2) [ dx(u1)*v1+dx(u2)*v2, dy(u1)*v1+dy(u2)*v2]//
+
+macro GradProd(s,t) (dx(s)*dx(t)+dy(s)*dy(t))//
+
+macro UgradV(u1,u2,v1,v2)[ [u1,u2]'*[dx(v1),dy(v1)] , [u1,u2]'*[dx(v2),dy(v2)] ]//
+
+macro cdot(u1,u2,v1,v2) u1*v1+u2*v2 //
+
+// =================================================Define Macro End======================================================//
+
+// =================================================Problem Setting=======================================================//
+// Stokes problem as initial guess
+problem StateStokes([u1,u2,p],[v1,v2,q]) =
+int2d(Th)( mu*(bilin(u1,u2,v1,v2))
+      - mix(v1,v2,p)-mix(u1,u2,q) + Darcy*cdot(u1,u2,v1,v2) -p*q*1e-16)
++ on(inflow,u1=1.0,u2=0)
++ on(wall,u1=0,u2=0);
+
+problem Oseen([du1,du2,dp],[v1,v2,q]) =
+		 int2d(Th) (  mu*(Grad(du1,du2)'*Grad(v1,v2) )
+		              + UgradV(du1,du2, u1, u2)'*[v1,v2]
+		              + UgradV( u1, u2,du1,du2)'*[v1,v2] 
+					     + Darcy*([du1,du2]'*[v1,v2])
+		              - div(du1,du2)*q - div(v1,v2)*dp
+		              - 1e-16*dp*q // stabilization term
+		             )
+		-int2d(Th) (  mu*(Grad(u1,u2)'*Grad(v1,v2) )
+		              + UgradV(u1,u2, u1, u2)'*[v1,v2]
+					     + Darcy*([u1,u2]'*[v1,v2])
+		              - div(u1,u2)*q - div(v1,v2)*p
+		              - 1e-16*p*q
+		             )
+	   +on(inflow, du1=0, du2=0)
+		+on(wall,du1=0,du2=0);
+
+problem AdjointState([uu1,uu2,pp],[vv1,vv2,qq])=
+	int2d(Th)(mu*bilin(uu1,uu2,vv1,vv2)-UgradV(u1,u2,uu1,uu2)'*[vv1,vv2]+GradUTV(u1,u2,uu1,uu2)'*[vv1,vv2]
+	+Darcy*[uu1,uu2]'*[vv1,vv2]-mix(vv1,vv2,pp)-mix(uu1,uu2,qq)-pp*qq*1e-16)
+	-int2d(Th)(mu*(GradProd(u1,vv1)+GradProd(u2,vv2))+Darcy*cdot(u1,u2,vv1,vv2))
+	+on(inflow, wall, uu1=0, uu2=0);
+
+problem CahnHiliard([phi, nu],[zeta,psi])
+=   int2d(Th)(phi*zeta) - int2d(Th)(phip*zeta)
+  - int2d(Th)(dt*grad(nu)'*grad(zeta))
+  + int2d(Th)(nu*psi) - int2d(Th)(kappa*grad(phi)'*grad(psi))
+  - int2d(Th)(1/kappa2*phip*(1-phip)*(phip-0.5)*psi)
+  + int2d(Th)(Sta2*grad(phi)'*grad(psi))-int2d(Th)(Sta2*grad(phip)'*grad(psi))
+  + int2d(Th)(Sta1*dt*phi*psi)-int2d(Th)(Sta1*dt*phip*psi) 
+  + int2d(Th)((eta/sqrtnorm*r)*psi);
+
+func phi0 = 0.65;//1- ( 0.5*(1-0.001)*cos(pi*5*x)*cos(pi*5*y)+0.5*(1+0.001) )
+//func phi0=min(abs(y-0.3)-0.1,abs(y+0.3)-0.1,max(abs(x),abs(y))-0.1);//
+//phip=phi0<0;
+phip = phi0;
+// =================================================End Problem Setting====================================================//
+for (iter=1;iter< Nmax;iter=iter+1)
+{
+cout << "iter: "<< iter << endl;
+phi = phip;
+
+if(iter%20==0)
+{
+  Maxphi = phi[].max;
+  Minphi = phi[].min;
+  ofstream MaxPhi("Maxphi.txt",append);
+  MaxPhi<<Maxphi<<endl;
+  ofstream MinPhi("Minphi.txt",append);
+  MinPhi<<Minphi<<endl;
+}
+// projection
+ X = max(0,phi);
+ X = min(X,1);
+
+Vol = int2d(Th)(1-phi);
+cout<<"Volume equals: "<<Vol<<endl;
+
+// update lagrange multiplier
+Darcy = alpha*(1-X);
+StateStokes;
+// // Newton iteration method to solve NS solution
+for( int n=0;n< 3;n++)
+	{
+    Oseen;
+	[u1,u2] = [u1-du1,u2-du2];
+	p =p-dp;
+   }
+
+AdjointState;
+
+//gradient flow scheme
+real norm = int2d(Th)((-0.5*alpha*cdot(u1,u2,u1,u2)+alpha*cdot(u1,u2,uu1,uu2))^2); 
+sqrtnorm = sqrt(norm);
+
+r = -eta/sqrtnorm*(0.5*alpha*cdot(u1,u2,u1,u2)+alpha*cdot(u1,u2,uu1,uu2));
+for(int k=0;k<PhaseIterNum;k++)
+{
+   CahnHiliard;
+   phip = phi;
+}
+
+objective = int2d(Th)(0.5*mu*bilin(u1,u2,u1,u2)+0.5*alpha*(1-X)*cdot(u1,u2,u1,u2))
+					+ int2d(Th)(0.5*kappa*grad(phi)'*grad(phi)+0.25/kappa2*(phi-1)^2*phi^2);
+cout<<"Van Der Waal free energy:"<<objective<<endl;
+ofstream VanDerWaal("VanDerWaal.txt",append);
+VanDerWaal<<objective<<endl;
+M = int2d(Th)(1-phi);
+ofstream Mass("Mass.txt",append);
+Mass<<M<<endl;
+string caption= " Free energy: "+objective+" volume: "+ Vol+ " iter :"+iter;
+plot(phi,cmm=caption,wait=0,value=1,fill=1);
+//plot([u1,u2],cmm=caption,wait=0,value=1,fill=0);
+string outputFile = "phase"+iter+ ".vtk";
+
+
+  if(iter==Nmax-1)
+  {savevtk(outputFile,Th,phi,dataname="phase");
+    // for velocity
+      ofstream ffuv("velcity.dat");
+      ffuv<<"Variables="<<"X"<<","<<"Y"<<","<<"u"<<","<<"v"<<","<<"M"<<endl;
+      ffuv<<"Zone"<<"   "<<"N="<<Th.nv<<","<<"E="<<Th.nt<<","<<"F=FEPOINT,ET=TRIANGLE"<<endl;
+
+
+      // out put for domain 1 velocity, pressure temparature
+         int i,j;
+      //
+        for( i=0;i<Th.nv;i++)
+        {
+        //ffnt<<Th(i).x<<"   "<<Th(i).y<<"   "<<T(Th(i).x,Th(i).y)<<endl;
+          ffuv<<Th(i).x<<"   "<<Th(i).y<<"   "<<u1(Th(i).x,Th(i).y)<<"   "<<u2(Th(i).x,Th(i).y)<<"     "<<sqrt(u1^2+u2^2)(Th(i).x,Th(i).y)<<endl;
+        }
+      //
+        for(i=0;i<Th.nt;i++)
+        {
+        for( j=0;j<3;j++)
+        {
+        //ffnt<<Th[i][j]+1<<"  ";
+        ffuv<<Th[i][j]+1<<"  ";
+          }
+        if(j==3)
+        {
+        //ffnt<<endl;
+        ffuv<<endl;
+          }
+       }
+  }
+}

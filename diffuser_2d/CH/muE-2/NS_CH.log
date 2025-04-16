@@ -1,0 +1,29 @@
+          min -17.6069  max 0.593821
+  -- Solve :
+          min -0.0600138  max 1.03032
+          min 0.159877  max 0.162823
+Van Der Waal free energy:8.21257
+iter: 149
+Volume equals: 0.35
+  -- Solve :
+          min -1.74159  max 3.75595
+          min -0.736034  max 17.1707
+  -- Solve :
+          min -0.631964  max 0.682067
+          min -7.85483  max 0.868333
+  -- Solve :
+          min -0.0275037  max 0.0288681
+          min -0.182428  max 0.0323963
+  -- Solve :
+          min -6.98963e-05  max 6.26235e-05
+          min -0.000234502  max 0.000257461
+  -- Solve :
+          min -0.384882  max 0.865206
+          min -17.5595  max 0.581293
+  -- Solve :
+          min -0.0600377  max 1.03077
+          min 0.15946  max 0.16236
+Van Der Waal free energy:8.20462
+ 0x2151f2ec820 VTK_FILE 1
+times: compile 0.103s, execution 132.625s,  mpirank:0
+ try getConsole C:\Users\user\Desktop\NS\¶þÎ¬diffuser\CH\muE-2\NS_CH.edp
